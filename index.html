@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo</title>
+</head>
+
+<body>
+    <h1>Todo List</h1>
+
+    <label for="">Task name:</label><br>
+    <input type="text" id="name" name="name">
+    <button onclick="add()">Add</button>
+
+    <div id="list"></div>
+</body>
+
+</html>
+
+<script>
+
+    get_data()
+
+    function get_data() {
+        fetch("http://localhost:5000/tasks")
+            .then(response => response.json())
+            .then(data => {
+                for (t of data.tasks) {
+                    console.log(t)
+                    document.querySelector("#list").innerHTML += `<li>${t.id} | ${t.name} <button onclick='delete_task(${t.id})'>Delete</button> `
+                }
+            })
+    }
+
+    function add() {
+        let name = document.querySelector("#name").value
+        console.log(name)
+        fetch("http://localhost:5000/tasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name: name })
+
+        }).then(response => response.json())
+        .then(data => {
+            document.querySelector("#list").innerHTML = ""
+            get_data()
+        })
+
+    }
+
+    function delete_task(id){
+        fetch("http://localhost:5000/tasks/"+id, 
+        {
+            method: "DELETE"
+        }).then(response=>response.json())
+        .then(data=>{
+            document.querySelector("#list").innerHTML = ""
+            get_data()
+        })
+    }
+
+
+
+</script>
